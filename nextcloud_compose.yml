@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  nextcloud_db:
+    container_name: nextcloud_db
+    image: mariadb:10.6
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
+    volumes:
+      - ./nextcloud/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Str0ngSecret!
+      MYSQL_PASSWORD: Str0ngSecret!
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+
+  nextcloud:
+    container_name: nextcloud
+    image: lscr.io/linuxserver/nextcloud
+    restart: unless-stopped
+    ports:
+      -  8080:80
+    links:
+      - nextcloud_db
+    volumes:
+      - /media/lupos/ae56645f-0d5d-4e9b-b0e9-3a8d0464bd5c/nextcloud:/var/www/html
+    environment:
+      MYSQL_PASSWORD: Str0ngSecret!
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_HOST: nextcloud_db
